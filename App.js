@@ -208,8 +208,10 @@ const styles = StyleSheet.create({
 
   resultText: {
     fontSize: 64,
-    color: '#333',
+    color: 'white',
+    textAlignVertical: 'bottom',
     textAlign: 'right',
+    fontFamily: "monospace",
     margin: 16,
   },
   
