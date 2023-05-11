@@ -1,5 +1,6 @@
 import { Fontisto, MaterialCommunityIcons , FontAwesome5 , AntDesign  } from '@expo/vector-icons';
 import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
+import { useState } from 'react'; 
 
 function CalculatorButton({content,color,onPress }) {
   return(
@@ -19,56 +20,137 @@ function CalculatorButton({content,color,onPress }) {
   )
 }
 
+function CalcDisplay(props) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.resultText}>{props.result}</Text>
+    </View>
+  );
+}
+
 export default function App() {
+
+  const [result, setResult] = useState('');
+
+  
+
+  const handleNumber = (value) => {
+    setResult((prevResult) => prevResult + value);
+  };
+
+  const handleOperation = (value) => {
+    setResult((prevResult) => {
+      if (prevResult === '') {
+        return '';
+      } else if (
+        prevResult.endsWith('+') ||
+        prevResult.endsWith('-') ||
+        prevResult.endsWith('*') ||
+        prevResult.endsWith('/')
+      ) {
+        return prevResult.slice(0, -1) + value;
+      } else {
+        return prevResult + value;
+      }
+    });
+  };
+
+  const handleEqual = () => {
+    let finalResult = calculate();
+    setResult(finalResult);
+  };
+
+  const handleClear = () => {
+    setResult('');
+  };
+  
+  const handleNegate = () => {
+    setResult((parseFloat(result) * -1).toString());
+  };
+
+
+   
+  const handleDecimal = () => {
+    setResult((prevResult) => {
+      if (prevResult === '') {
+        return '0.';
+      } else if (prevResult.includes('.')) {
+        return prevResult;
+      } else {
+        return prevResult + '.';
+      }
+    });
+  };
+
+  const calculate = () => {
+    let expression = result;
+    if (
+      expression.endsWith('+') ||
+      expression.endsWith('-') ||
+      expression.endsWith('*') ||
+      expression.endsWith('/')
+    ) {
+      expression = expression.slice(0, -1);
+    }
+
+    try {
+      let result = eval(expression);
+      return result.toString();
+    } catch (error) {
+      return 'Error';
+    }
+  };
+
+
+  const handlePercentage = () => {
+    setResult((parseFloat(result) / 100).toString());
+  };
+
+
+  const handleBackspace = () => {
+    setResult((prevResult) => prevResult.slice(0, -1));
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.tela}>
-      <Text style={{
-        fontSize: 30,
-        fontWeight:'900',
-        color: 'white',
-        fontFamily: 'monospace',
-        margin:10,
-        padding:10
-        
-      }}>
-        308 x 42 = 
-      12936
-      </Text>
+        <CalcDisplay result={result.toString()} />
       </View>
       <View style={styles.teclado}>
         <View style={styles.coluna}>
-          <CalculatorButton  content={'AC'} color={'#3ae2bf'}>
+          <CalculatorButton  onPress = {() => handleClear()}content={'AC'} color={'#3ae2bf'}>
           </CalculatorButton>
-          <CalculatorButton content={'7'} color={'white'}/>
-          <CalculatorButton content={'4'} color={'white'}/>
-          <CalculatorButton content={'1'} color={'white'}/>
-          <CalculatorButton content={<Fontisto name="undo" size={24} color="white" />} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleNumber(7)} content={'7'} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleNumber(4)} content={'4'} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleNumber(1)} content={'1'} color={'white'}/>
+          <CalculatorButton onPress={() => handleBackspace()} content={<Fontisto name="undo" size={24} color="white" />} color={'white'}/>
         </View>
         <View style={styles.coluna}>
-          <CalculatorButton content={'+/-'} color={'#3ae2bf'}/>
-          <CalculatorButton content={'8'} color={'white'}/>
-          <CalculatorButton content={'5'} color={'white'}/>
-          <CalculatorButton content={'2'} color={'white'}/>
-          <CalculatorButton content={'0'} color={'white'}/>
+          <CalculatorButton onPress = {() => handleNegate()}content={'+/-'} color={'#3ae2bf'}/>
+          <CalculatorButton onPress ={()=> handleNumber(8)} content={'8'} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleNumber(5)} content={'5'} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleNumber(2)} content={'2'} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleNumber(0)} content={'0'} color={'white'}/>
         </View>
         <View style={styles.coluna}>
-          <CalculatorButton content={'%'} color={'#3ae2bf'}/>
-          <CalculatorButton content={'9'} color={'white'}/>
-          <CalculatorButton content={'6'} color={'white'}/>
-          <CalculatorButton content={'3'} color={'white'}/>
-          <CalculatorButton content={'.'} color={'white'}/>
+          <CalculatorButton onPress={() => handlePercentage()}content={'%'} color={'#3ae2bf'}/>
+          <CalculatorButton onPress ={()=> handleNumber(9)} content={'9'} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleNumber(6)} content={'6'} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleNumber(3)} content={'3'} color={'white'}/>
+          <CalculatorButton onPress ={()=> handleDecimal()} content={'.'} color={'white'}/>
         </View>
         <View style={styles.coluna}>
-          <CalculatorButton content={<MaterialCommunityIcons name="division" size={28} color="#c16a73" />} color={'#c16a73'}/>
-          <CalculatorButton content={<FontAwesome5 name="times" size={20} color="c16a73" />} color={''}/>
-          <CalculatorButton content={<AntDesign name="minus" size={24} color="#c16a73" />} color={'#c16a73'}/>
-          <CalculatorButton content={<AntDesign name="plus" size={24} color="#c16a73" />} color={'#c16a73'}/>
-          <CalculatorButton content={<FontAwesome5 name="equals" size={24} color="#c16a73black" />} color={'#c16a73'}/>
+          <CalculatorButton onPress ={()=> handleOperation('/')} content={<MaterialCommunityIcons name="division" size={28} color="#c16a73" />} color={'#c16a73'}/>
+          <CalculatorButton onPress ={()=> handleOperation('*')} content={<FontAwesome5 name="times" size={20} color="#c16a73" />} color={''}/>
+          <CalculatorButton onPress ={()=> handleOperation('-')} content={<AntDesign name="minus" size={24} color="#c16a73" />} color={'#c16a73'}/>
+          <CalculatorButton onPress ={()=> handleOperation('+')} content={<AntDesign name="plus" size={24} color="#c16a73" />} color={'#c16a73'}/>
+          <CalculatorButton onPress ={() => handleEqual()} content={<FontAwesome5 name="equals" size={24} color="#c16a73black" />} color={'#c16a73'}/>
         </View>
       </View>
     </View>
   );
+
+  
 }
 
 const styles = StyleSheet.create({
@@ -122,6 +204,13 @@ const styles = StyleSheet.create({
     padding:10
 
     
+  },
+
+  resultText: {
+    fontSize: 64,
+    color: '#333',
+    textAlign: 'right',
+    margin: 16,
   },
   
 
